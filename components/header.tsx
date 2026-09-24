@@ -29,22 +29,25 @@ import {
   Star,
   User,
   ChevronDown,
-  HelpCircle
+  HelpCircle,
+  AlertTriangle
 } from 'lucide-react';
+import { APP_NAME } from '@/lib/app-config';
 
 const navigation = [
   { name: 'ホーム', href: '/', icon: Home },
   { name: '潮見表', href: '#tide', icon: Waves },
-  { name: '波情報', href: '#wave', icon: Waves },
+  { name: '波情報', href: '#weather', icon: Waves },
   { name: '天気予報', href: '#weather', icon: Cloud },
   { name: 'カレンダー', href: '#calendar', icon: Calendar },
   { name: 'スポット', href: '#spots', icon: MapPin },
   { name: '周辺施設', href: '#map', icon: Map },
   { name: 'ニュース', href: '#news', icon: Newspaper },
   { name: '情報', href: '#info', icon: Building2 },
+  { name: '災害マップ', href: '#disaster', icon: AlertTriangle },
 ];
 
-export function Header() {
+export function Header({ onNavigate }: { onNavigate?: (hash: string) => void } = {}) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -53,7 +56,7 @@ export function Header() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
           <Waves className="w-6 h-6 md:w-7 md:h-7 text-primary" />
-          <span className="font-bold text-lg md:text-xl text-foreground">Surf Life</span>
+          <span className="font-bold text-lg md:text-xl text-foreground">{APP_NAME}</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -62,6 +65,12 @@ export function Header() {
             <Link
               key={item.name}
               href={item.href}
+              onClick={(e) => {
+                if (item.href.startsWith('#') && onNavigate) {
+                  e.preventDefault();
+                  onNavigate(item.href);
+                }
+              }}
               className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-secondary/50"
             >
               {item.name}
@@ -97,7 +106,7 @@ export function Header() {
             <SheetHeader>
               <SheetTitle className="text-foreground flex items-center gap-2">
                 <Waves className="w-5 h-5 text-primary" />
-                Surf Life
+                {APP_NAME}
               </SheetTitle>
             </SheetHeader>
             <nav className="mt-6 flex flex-col gap-1">
@@ -105,7 +114,13 @@ export function Header() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  onClick={() => setIsOpen(false)}
+                  onClick={(e) => {
+                    setIsOpen(false);
+                    if (item.href.startsWith('#') && onNavigate) {
+                      e.preventDefault();
+                      onNavigate(item.href);
+                    }
+                  }}
                   className="flex items-center gap-3 px-3 py-3 text-foreground hover:bg-secondary/50 rounded-md transition-colors"
                 >
                   <item.icon className="w-5 h-5 text-muted-foreground" />

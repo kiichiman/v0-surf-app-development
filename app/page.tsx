@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import dynamic from 'next/dynamic';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { TideGraph } from '@/components/tide-graph';
@@ -15,7 +16,10 @@ import { InfoSources } from '@/components/info-sources';
 import { NewsHeadlines } from '@/components/news-headlines';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Waves, Calendar as CalendarIcon, AlertCircle, RefreshCw } from 'lucide-react';
+import { Waves, Calendar as CalendarIcon, AlertCircle, RefreshCw, AlertTriangle } from 'lucide-react';
+import { SectionNav } from '@/components/section-nav';
+import { useDisasterUpdates } from '@/hooks/use-disaster-updates';
+import { type Category, type Carrier } from '@/lib/disaster/core';
 import { Button } from '@/components/ui/button';
   import { useTideData, useWeatherData, useTyphoonData, getWeatherText } from '@/hooks/use-api-data';
 import {
@@ -23,6 +27,20 @@ import {
   type TideData,
   type WeeklyForecast,
 } from '@/lib/tide-data';
+
+const DisasterMapView = dynamic(() => import('@/components/disaster/disaster-map-view'), { ssr: false, loading: () => <p className="py-10 text-center text-sm text-muted-foreground">地図を読み込み中…</p> });
+const ReportDialog = dynamic(() => import('@/components/disaster/report-dialog'), { ssr: false });
+
+const SEA_SECTIONS = [
+  { id: 'location', label: '地点' },
+  { id: 'tide', label: '潮汐' },
+  { id: 'weather', label: '天気' },
+  { id: 'calendar', label: '潮見表' },
+  { id: 'spots', label: 'スポット' },
+  { id: 'map', label: '周辺施設' },
+  { id: 'news', label: 'ニュース' },
+  { id: 'info', label: 'リンク集' },
+];
 
 // サンプルの周辺施設データ
 // APIデータをアプリの形式に変換する関数
@@ -256,6 +274,49 @@ function convertJmaWeeklyForecast(weatherData: ReturnType<typeof useWeatherData>
 }
 
 export default function HomePage() {
+  const [mainTab, setMainTab] = useState<'sea' | 'disaster'>('sea');
+  const [disasterMounted, setDisasterMounted] = useState<boolean>(false);
+  const [reportOpen, setReportOpen] = useState<boolean>(false);
+  const [refreshKey, setRefreshKey] = useState<number>(0);
+  const [focus, setFocus] = useState<{ category: Category; carrier: Carrier | null; nonce: number } | undefined>(undefined);
+  const { hasNew, newCount, markSeen } = useDisasterUpdates();
+
+  const openTab = useCallback((tab: 'sea' | 'disaster') => {
+    if (tab === 'disaster') {
+      setDisasterMounted(true);
+      setMainTab('disaster');
+      markSeen();
+      history.replaceState(null, '', '#disaster');
+      window.scrollTo({ top: 0 });
+    } else {
+      setMainTab('sea');
+      history.replaceState(null, '', window.location.pathname);
+    }
+  }, [markSeen]);
+
+  useEffect(() => {
+    if (window.location.hash === '#disaster') {
+      openTab('disaster');
+    }
+  }, [openTab]);
+
+  useEffect(() => {
+    if (mainTab === 'disaster' && hasNew) {
+      markSeen();
+    }
+  }, [mainTab, hasNew, markSeen]);
+
+  const handleNavigate = useCallback((hash: string) => {
+    if (hash === '#disaster') {
+      openTab('disaster');
+    } else {
+      openTab('sea');
+      setTimeout(() => {
+        document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 60);
+    }
+  }, [openTab]);
+
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   
@@ -359,9 +420,47 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-      
-      <main className="container mx-auto px-4 py-6 md:py-8">
+      <Header onNavigate={handleNavigate} />
+      <div className="sticky top-14 md:top-16 z-40 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+        <div className="container mx-auto px-4 pt-3">
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              aria-pressed={mainTab === 'sea'}
+              onClick={() => openTab('sea')}
+              className={
+                mainTab === 'sea'
+                  ? 'flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-bold bg-primary text-primary-foreground'
+                  : 'flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-bold bg-secondary text-secondary-foreground'
+              }
+            >
+              <Waves className="w-4 h-4" />
+              海・天気
+            </button>
+            <button
+              type="button"
+              aria-pressed={mainTab === 'disaster'}
+              onClick={() => openTab('disaster')}
+              className={
+                mainTab === 'disaster'
+                  ? 'flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-bold bg-primary text-primary-foreground'
+                  : hasNew
+                    ? 'flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-bold bg-red-600 text-white animate-pulse'
+                    : 'flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-bold bg-secondary text-secondary-foreground'
+              }
+            >
+              <AlertTriangle className="w-4 h-4" />
+              災害マップ
+              {mainTab !== 'disaster' && hasNew && (
+                <span className="rounded-full bg-white px-2 py-0.5 text-xs font-bold text-red-600">新着{newCount}</span>
+              )}
+            </button>
+          </div>
+          {mainTab === 'sea' ? <SectionNav sections={SEA_SECTIONS} /> : <div className="h-3" />}
+        </div>
+      </div>
+
+      <main className={mainTab === 'sea' ? 'container mx-auto px-4 py-6 md:py-8' : 'hidden'}>
         {/* APIエラー時の通知 */}
         {tideError && (
           <div className="mb-4 p-4 bg-destructive/10 border border-destructive/20 rounded-lg flex items-center gap-3">
@@ -393,7 +492,7 @@ export default function HomePage() {
         </div>
         
         {/* 地点情報 */}
-        <section id="location" className="mb-6">
+        <section id="location" className="mb-6 scroll-mt-44">
           <LocationInfo
             name={apiTideData?.tide?.port?.harbor_namej || '山村湾（徳之島）'}
             region="鹿児島県大島郡徳之島町"
@@ -404,7 +503,7 @@ export default function HomePage() {
         </section>
 
         {/* 本日の潮汐情報 */}
-        <section id="tide" className="mb-6">
+        <section id="tide" className="mb-6 scroll-mt-44">
           <Card className="bg-card border-border">
             <CardHeader className="pb-3">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
@@ -457,7 +556,7 @@ export default function HomePage() {
         </section>
 
         {/* 週間天気予報 */}
-        <section id="weather" className="mb-6">
+        <section id="weather" className="mb-6 scroll-mt-44">
           <WeeklyForecastCard 
             forecasts={weeklyForecast} 
             typhoons={typhoons}
@@ -467,30 +566,50 @@ export default function HomePage() {
         </section>
 
         {/* 月間潮見表 */}
-        <section id="calendar" className="mb-6">
+        <section id="calendar" className="mb-6 scroll-mt-44">
           <MonthlyTideCalendar tideDataList={displayMonthlyData} />
         </section>
 
         {/* 徳之島 海のスポットマップ */}
-        <section id="spots" className="mb-6">
+        <section id="spots" className="mb-6 scroll-mt-44">
           <TokunoshimaSpots />
         </section>
 
         {/* 周辺施設 */}
-        <section id="map" className="mb-6">
+        <section id="map" className="mb-6 scroll-mt-44">
           <NearbyPlaces />
         </section>
 
         {/* 地域の最新ニュース見出し */}
-        <section id="news" className="mb-6">
+        <section id="news" className="mb-6 scroll-mt-44">
           <NewsHeadlines />
         </section>
 
         {/* 地域情報リンク集 */}
-        <section id="info" className="mb-6">
+        <section id="info" className="mb-6 scroll-mt-44">
           <InfoSources />
         </section>
       </main>
+
+      {disasterMounted && (
+        <div className={mainTab === 'disaster' ? 'container mx-auto px-4 py-6' : 'hidden'}>
+          <DisasterMapView
+            active={mainTab === 'disaster'}
+            refreshKey={refreshKey}
+            focus={focus}
+            onRequestReport={() => setReportOpen(true)}
+          />
+        </div>
+      )}
+      <ReportDialog
+        open={reportOpen}
+        onClose={() => setReportOpen(false)}
+        onSubmitted={(category, carrier) => {
+          setReportOpen(false);
+          setRefreshKey((k) => k + 1);
+          setFocus({ category, carrier, nonce: Date.now() });
+        }}
+      />
 
       <Footer />
     </div>
