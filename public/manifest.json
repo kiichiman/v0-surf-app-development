@@ -1,7 +1,7 @@
 {
-  "name": "Surf Life - 潮見表・波情報",
-  "short_name": "Surf Life",
-  "description": "サーファー・釣り人のための潮見表、タイドグラフ、波情報、気象情報アプリ",
+  "name": "しまいま - 潮・天気・災害情報",
+  "short_name": "しまいま",
+  "description": "奄美大島・徳之島の潮見表、波・天気と、停電・断水・通信障害の通報マップ",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0c1929",
