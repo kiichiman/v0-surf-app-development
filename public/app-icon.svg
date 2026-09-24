@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <clipPath id="roundedClip">
+      <rect width="512" height="512" rx="96"/>
+    </clipPath>
+    <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0ea5e9"/>
+    </linearGradient>
+    <linearGradient id="moonGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef3c7"/>
+      <stop offset="100%" stop-color="#fbbf24"/>
+    </linearGradient>
+  </defs>
+  <g clip-path="url(#roundedClip)">
+    <rect width="512" height="512" fill="#0c1929"/>
+    <!-- Moon -->
+    <circle cx="380" cy="130" r="45" fill="url(#moonGradient)"/>
+    <circle cx="398" cy="118" r="40" fill="#0c1929"/>
+    <!-- Wave 1 -->
+    <path d="M0 340 Q80 280 160 340 T320 340 T480 340 T640 340 L640 520 L0 520 Z" fill="url(#waveGradient)" opacity="0.3"/>
+    <!-- Wave 2 -->
+    <path d="M0 380 Q80 310 160 380 T320 380 T480 380 T640 380 L640 520 L0 520 Z" fill="url(#waveGradient)" opacity="0.5"/>
+    <!-- Wave 3 (main) -->
+    <path d="M0 420 Q80 350 160 420 T320 420 T480 420 T640 420 L640 520 L0 520 Z" fill="url(#waveGradient)"/>
+  </g>
+</svg>

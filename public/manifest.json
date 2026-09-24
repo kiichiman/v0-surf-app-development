@@ -1,0 +1,33 @@
+{
+  "name": "Surf Life - 潮見表・波情報",
+  "short_name": "Surf Life",
+  "description": "サーファー・釣り人のための潮見表、タイドグラフ、波情報、気象情報アプリ",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0c1929",
+  "theme_color": "#0ea5e9",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/app-icon.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/app-icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["weather", "lifestyle", "sports"],
+  "lang": "ja",
+  "dir": "ltr"
+}
