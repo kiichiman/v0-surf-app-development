@@ -54,7 +54,16 @@ export function Header({ onNavigate }: { onNavigate?: (hash: string) => void } =
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <div className="container mx-auto px-4 h-14 md:h-16 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
+        <Link
+          href="/"
+          onClick={(e) => {
+            if (onNavigate) {
+              e.preventDefault();
+              onNavigate('/');
+            }
+          }}
+          className="flex items-center gap-2"
+        >
           <Waves className="w-6 h-6 md:w-7 md:h-7 text-primary" />
           <span className="font-bold text-lg md:text-xl text-foreground">{APP_NAME}</span>
         </Link>
@@ -66,7 +75,7 @@ export function Header({ onNavigate }: { onNavigate?: (hash: string) => void } =
               key={item.name}
               href={item.href}
               onClick={(e) => {
-                if (item.href.startsWith('#') && onNavigate) {
+                if ((item.href.startsWith('#') || item.href === '/') && onNavigate) {
                   e.preventDefault();
                   onNavigate(item.href);
                 }
@@ -116,7 +125,7 @@ export function Header({ onNavigate }: { onNavigate?: (hash: string) => void } =
                   href={item.href}
                   onClick={(e) => {
                     setIsOpen(false);
-                    if (item.href.startsWith('#') && onNavigate) {
+                    if ((item.href.startsWith('#') || item.href === '/') && onNavigate) {
                       e.preventDefault();
                       onNavigate(item.href);
                     }

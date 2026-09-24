@@ -353,7 +353,7 @@ export default function DisasterMapView({ active, refreshKey, onRequestReport, f
         <span className="text-xs text-foreground whitespace-nowrap">{displayedTime}</span>
       </div>
 
-      <div className="relative">
+      <div className="relative isolate">
         <div ref={mapElRef} style={{ height: '60vh', minHeight: '350px', width: '100%' }} className="rounded" />
         <div className="absolute left-2 bottom-2 z-[1000] bg-white/90 rounded shadow p-2 text-xs text-gray-800">
           <div className="flex items-center gap-1">

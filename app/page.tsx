@@ -307,7 +307,10 @@ export default function HomePage() {
   }, [mainTab, hasNew, markSeen]);
 
   const handleNavigate = useCallback((hash: string) => {
-    if (hash === '#disaster') {
+    if (hash === '/') {
+      openTab('sea');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (hash === '#disaster') {
       openTab('disaster');
     } else {
       openTab('sea');
