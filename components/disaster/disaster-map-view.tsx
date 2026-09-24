@@ -48,6 +48,7 @@ export default function DisasterMapView({ active, refreshKey, onRequestReport, f
   const msgTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const channelRef = useRef<RealtimeChannel | null>(null);
   const invalidateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const firstFitDoneRef = useRef(false);
 
   const [category, setCategory] = useState<Category>('power');
   const [carrier, setCarrier] = useState<'' | Carrier>('');
@@ -235,6 +236,10 @@ export default function DisasterMapView({ active, refreshKey, onRequestReport, f
     if (invalidateTimerRef.current) clearTimeout(invalidateTimerRef.current);
     invalidateTimerRef.current = setTimeout(() => {
       mapRef.current?.invalidateSize();
+      if (!firstFitDoneRef.current) {
+        mapRef.current?.fitBounds(ALL_BOUNDS);
+        firstFitDoneRef.current = true;
+      }
     }, 100);
     return () => {
       if (invalidateTimerRef.current) clearTimeout(invalidateTimerRef.current);
@@ -355,40 +360,40 @@ export default function DisasterMapView({ active, refreshKey, onRequestReport, f
 
       <div className="relative isolate">
         <div ref={mapElRef} style={{ height: '60vh', minHeight: '350px', width: '100%' }} className="rounded" />
-        <div className="absolute left-2 bottom-2 z-[1000] bg-white/90 rounded shadow p-2 text-xs text-gray-800">
-          <div className="flex items-center gap-1">
+      </div>
+      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+        <span className="inline-flex items-center gap-1">
+          <span
+            className="inline-block w-3 h-3 rounded-full"
+            style={{ backgroundColor: STATE_COLORS.warning }}
+          />
+          <span>予兆</span>
+        </span>
+        <span className="inline-flex items-center gap-1">
+          <span
+            className="inline-block w-3 h-3 rounded-full"
+            style={{ backgroundColor: STATE_COLORS.active }}
+          />
+          <span>障害中</span>
+        </span>
+        <span className="inline-flex items-center gap-1">
+          <span
+            className="inline-block w-3 h-3 rounded-full"
+            style={{ backgroundColor: STATE_COLORS.restored }}
+          />
+          <span>復旧</span>
+        </span>
+        <span className="text-border">|</span>
+        <span>通信キャリア（外側リング）：</span>
+        {CARRIERS.map((c) => (
+          <span key={c} className="inline-flex items-center gap-1">
             <span
               className="inline-block w-3 h-3 rounded-full"
-              style={{ backgroundColor: STATE_COLORS.warning }}
+              style={{ backgroundColor: CARRIER_COLORS[c], border: '2px solid white' }}
             />
-            <span>予兆</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <span
-              className="inline-block w-3 h-3 rounded-full"
-              style={{ backgroundColor: STATE_COLORS.active }}
-            />
-            <span>障害中</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <span
-              className="inline-block w-3 h-3 rounded-full"
-              style={{ backgroundColor: STATE_COLORS.restored }}
-            />
-            <span>復旧</span>
-          </div>
-          <hr className="my-1 border-gray-300" />
-          <div className="mb-1">通信キャリア（外側リング）</div>
-          {CARRIERS.map((c) => (
-            <div key={c} className="flex items-center gap-1">
-              <span
-                className="inline-block w-3 h-3 rounded-full"
-                style={{ backgroundColor: CARRIER_COLORS[c], border: '2px solid white' }}
-              />
-              <span>{CARRIER_LABELS[c]}</span>
-            </div>
-          ))}
-        </div>
+            <span>{CARRIER_LABELS[c]}</span>
+          </span>
+        ))}
       </div>
 
       <p className="text-xs text-muted-foreground mt-2">
