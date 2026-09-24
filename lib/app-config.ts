@@ -1,1 +1,1 @@
-export const APP_NAME = 'Surf Life';
+export const APP_NAME = 'しまいま';

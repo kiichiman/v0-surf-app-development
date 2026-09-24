@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { APP_NAME } from '@/lib/app-config';
 import { Waves, Mail, Facebook, Twitter, ExternalLink, Database, Cloud } from 'lucide-react';
 
 export function Footer() {
@@ -10,7 +11,7 @@ export function Footer() {
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-3">
               <Waves className="w-6 h-6 text-primary" />
-              <span className="font-bold text-lg text-foreground">Surf Life</span>
+              <span className="font-bold text-lg text-foreground">{APP_NAME}</span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed">
               サーファー、釣り人、海事関係者のための潮見表・波情報・気象情報を提供しています。
@@ -164,7 +165,7 @@ export function Footer() {
         
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs text-muted-foreground">
-            &copy; {new Date().getFullYear()} Surf Life. All rights reserved.
+            &copy; {new Date().getFullYear()} {APP_NAME}. All rights reserved.
           </p>
           <p className="text-xs text-muted-foreground">
             潮汐: tide736.net | 天気: 気象庁

@@ -14,14 +14,14 @@ export const viewport = {
 }
 
 export const metadata: Metadata = {
-  title: 'Surf Life - 潮見表・波情報・気象情報',
-  description: 'サーファー・釣り人のための潮見表、タイドグラフ、波情報、気象情報を提供するウェブアプリ',
+  title: 'しまいま - 奄美大島・徳之島の潮・天気・災害情報',
+  description: '奄美大島・徳之島の潮見表、波・天気と、停電・断水・通信障害の通報マップをひとつにまとめたウェブアプリ',
   generator: 'v0.app',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Surf Life',
+    title: 'しまいま',
   },
   icons: {
     icon: [
@@ -33,8 +33,8 @@ export const metadata: Metadata = {
     apple: '/app-icon.svg',
   },
   openGraph: {
-    title: 'Surf Life - 潮見表・波情報・気象情報',
-    description: 'サーファー・釣り人のための潮見表、タイドグラフ、波情報、気象情報を提供するウェブアプリ',
+    title: 'しまいま - 奄美大島・徳之島の潮・天気・災害情報',
+    description: '奄美大島・徳之島の潮見表、波・天気と、停電・断水・通信障害の通報マップをひとつにまとめたウェブアプリ',
     type: 'website',
     locale: 'ja_JP',
   },
